@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="    
+            http://www.springframework.org/schema/beans     
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd    
+            http://cxf.apache.org/jaxws    
+            http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<bean id="simpleTask" class="com.lu.quartz.SimpleTriggerTask"></bean>
+	<bean id="conTask" class="com.lu.quartz.ConTriggerTask"></bean>
+	<bean id="job1"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!--false表示等上一个任务执行完后再开启新的任务-->  
+    	<property name="concurrent" value="false"/>  
+		<property name="targetObject" ref="simpleTask">
+		</property>
+		<property name="targetMethod" value="run"></property>
+	</bean>
+	<bean id="job2"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="conTask">
+		</property>
+		<property name="targetMethod" value="run"></property>
+	</bean>
+	<bean id="simpleTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="job1" />
+		<property name="startDelay" value="0" />
+		<property name="repeatInterval" value="6000" /> <!-- 每6秒执行一次 -->
+	</bean>
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="job2" />
+		<property name="cronExpression" value="0 0/5 16 * * ?" /><!-- 16时每五分钟执行一次 -->
+	</bean>
+	
+	<!-- 继承quartz jobbean的配置 --> 
+	<bean id="jobData" class="com.lu.quartz.JobData"></bean> 
+<!--     <bean id="jobDetailTask" class="org.springframework.scheduling.quartz.JobDetailBean"> 
+       <property name="jobClass" value="com.lu.quartz.JobDetailTask"></property> 
+       <property name="jobDataAsMap"> 
+         <map> 
+           <entry key="jobData" value-ref="jobData"></entry> 
+         </map> 
+       </property> 
+   </bean> 
+
+   <bean id="cronTrigger1"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetailTask" />
+		<property name="cronExpression" value="30 0/5 16 * * ?" />16时每五分钟执行一次
+	</bean>  -->
+	<bean id="cronTriggerPunch" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<!-- 使用嵌套Bean的方式来定义任务Bean -->
+			<bean class="org.springframework.scheduling.quartz.JobDetailBean">
+				<!-- 指定任务Bean的实现类 -->
+				<property name="jobClass" value="com.lu.quartz.JobDetailTask" />
+				<!-- 为任务Bean注入属性 -->
+				<property name="jobDataAsMap">
+					<map>
+						<entry key="jobData" value-ref="jobData" />
+					</map>
+				</property>
+			</bean>
+		</property>
+		<!-- 指定Cron表达式：周一到周五7点、12点执行调度 -->
+		<property name="cronExpression" value="30 0/5 16 * * ?" />
+	</bean>  
+
+	<!-- quartz触发器管理 --> 
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger" />
+				<ref bean="cronTrigger" />
+				<ref bean="cronTriggerPunch" />
+			</list>
+		</property>
+	</bean>
+</beans>  

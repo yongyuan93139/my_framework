@@ -1,0 +1,6 @@
+package com.lu.groovy
+
+enum Day {
+	SUNDAY, MONDAY, TUESDAY, WEDNESDAY,
+	THURSDAY, FRIDAY, SATURDAY
+}

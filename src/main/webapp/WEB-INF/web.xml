@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<web-app version="2.4"   
+    xmlns="http://java.sun.com/xml/ns/j2ee"   
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee   
+    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">  
+    <!-- Spring 容器加载的配置文件 设置 -->  
+    <context-param>  
+        <param-name>contextConfigLocation</param-name>  
+        <param-value>  
+            <!-- classpath:applicationContext-cxf-server.xml   -->
+            classpath:applicationContext-*.xml  
+        </param-value>  
+    </context-param>  
+      
+         <!-- Spring 配置 -->  
+         <listener>  
+                  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>  
+         </listener>  
+         <listener>  
+                  <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>  
+         </listener>
+
+	<servlet>
+		<servlet-name>sysInit</servlet-name>
+		<servlet-class>com.lu.web.SysInitServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<description>加载/WEB-INF/spring-mvc/目录下的所有XML作为Spring MVC的配置文件</description>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring-mvc/*.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<!-- 拦截.htm的请求 -->
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+      
+    <!-- CXF WebServices设置 -->  
+    <servlet>  
+        <servlet-name>CXFServices</servlet-name>  
+        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>  
+        <load-on-startup>0</load-on-startup>  
+    </servlet>  
+    <servlet-mapping>  
+        <servlet-name>CXFServices</servlet-name>  
+        <url-pattern>/services/*</url-pattern>  
+    </servlet-mapping>  
+      
+  <welcome-file-list>  
+    <welcome-file>index.jsp</welcome-file>  
+  </welcome-file-list>  
+</web-app>  
